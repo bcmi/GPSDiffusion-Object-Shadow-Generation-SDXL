@@ -1134,7 +1134,7 @@ def main(args):
     controlnet.train()
 
     #ip-adapter
-    num_tokens = 4
+    num_tokens = 64
     image_proj_model = ImageProjModel(
         cross_attention_dim=unet.config.cross_attention_dim,
         extra_embeddings_dim=2048,
