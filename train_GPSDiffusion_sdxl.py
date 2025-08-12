@@ -229,12 +229,11 @@ class IPAdapter(torch.nn.Module):
 class ImageProjModel(torch.nn.Module):
     """Projection Model"""
 
-    def __init__(self, cross_attention_dim=768, extra_embeddings_dim=2048, clip_extra_context_tokens=64):
+    def __init__(self, cross_attention_dim=768, extra_embeddings_dim=2048):
         super().__init__()
 
         self.generator = None
         self.cross_attention_dim = cross_attention_dim
-        self.clip_extra_context_tokens = clip_extra_context_tokens
         self.proj = torch.nn.Linear(extra_embeddings_dim, cross_attention_dim)
         self.norm = torch.nn.LayerNorm(cross_attention_dim)
 
@@ -1138,7 +1137,6 @@ def main(args):
     image_proj_model = ImageProjModel(
         cross_attention_dim=unet.config.cross_attention_dim,
         extra_embeddings_dim=2048,
-        clip_extra_context_tokens=64,
     ).to(accelerator.device)
 
     # init adapter modules
