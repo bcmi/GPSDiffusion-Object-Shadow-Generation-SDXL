@@ -101,9 +101,9 @@ class TestDataset(Dataset):
 
     def embedding_cache_paths(self):
         return {
-            'prompt_embeds': os.path.join(self.data_root, 'prompt_embeds.pt'),
-            'text_embeds': os.path.join(self.data_root, 'text_embeds.pt'),
-            'time_ids': os.path.join(self.data_root, 'time_ids.pt')
+            'prompt_embeds': 'prompt_embeds_test.pt',
+            'text_embeds': 'text_embeds_test.pt',
+            'time_ids': 'time_ids_test.pt'
         }
 
     def load_or_generate_embeddings(self):
@@ -175,6 +175,7 @@ class TestDataset(Dataset):
 
     def __getitem__(self, idx):
         pic_name = self.data[idx]
+        base_name = os.path.splitext(os.path.basename(pic_name))[0]
 
         shadowfree_img = self.load_image('shadowfree_imgs', pic_name)
         object_mask = self.load_mask('object_masks', pic_name)
@@ -196,7 +197,8 @@ class TestDataset(Dataset):
             "unet_added_conditions": {
                 "text_embeds": self.text_embeds[idx],
                 "time_ids": self.time_ids[idx]
-            }
+            },
+            "name": base_name
         }
 
 class IPAdapter(torch.nn.Module):
