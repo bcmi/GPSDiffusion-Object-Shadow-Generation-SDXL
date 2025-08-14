@@ -90,9 +90,9 @@ class TrainDataset(Dataset):
 
     def embedding_cache_paths(self):
         return {
-            'prompt_embeds': os.path.join(self.data_root, 'prompt_embeds.pt'),
-            'text_embeds': os.path.join(self.data_root, 'text_embeds.pt'),
-            'time_ids': os.path.join(self.data_root, 'time_ids.pt')
+            'prompt_embeds': 'prompt_embeds_train.pt',
+            'text_embeds': 'text_embeds_train.pt',
+            'time_ids': 'time_ids_train.pt'
         }
 
     def load_or_generate_embeddings(self):
