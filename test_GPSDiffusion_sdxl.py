@@ -180,15 +180,18 @@ class TestDataset(Dataset):
         shadowfree_img = self.load_image('shadowfree_imgs', pic_name)
         object_mask = self.load_mask('object_masks', pic_name)
         shadow_img = self.load_image('shadowfree_imgs', pic_name)
+        gt = self.load_image('shadow_imgs', pic_name)
 
         control_input = np.concatenate([shadowfree_img, object_mask[..., None]], axis=-1)
         control_input = control_input.astype(np.float32) / 255.0
         target = (shadow_img.astype(np.float32) / 127.5) - 1.0
+        gt= (gt.astype(np.float32) / 127.5) - 1.0
 
         bbx_tensor, bbx_region = self.compute_bbx(object_mask)
 
         return {
             "pixel_values": torch.tensor(target).permute(2, 0, 1).float(),
+            "gt": torch.tensor(gt).permute(2, 0, 1).float(),
             "conditioning_pixel_values": torch.tensor(control_input).permute(2, 0, 1).float(),
             "bbx": bbx_region,
             "fg": bbx_tensor,
@@ -1166,10 +1169,12 @@ def main(args):
                 predict_dir = os.path.join(args.test_result_dir, "gen_result")
                 shadowfree_dir = os.path.join(args.test_result_dir, "gt_shadowfree_img")
                 mask_dir = os.path.join(args.test_result_dir, "gt_object_mask")
+                shadow_img_dir = os.path.join(args.test_result_dir, "gt_shadow_img")
                 
                 os.makedirs(predict_dir, exist_ok=True)
                 os.makedirs(shadowfree_dir, exist_ok=True)
                 os.makedirs(mask_dir, exist_ok=True)
+                os.makedirs(shadow_img_dir, exist_ok=True)
 
                 # Decode final latent to image
                 latents = latents / vae.config.scaling_factor
@@ -1180,11 +1185,15 @@ def main(args):
                 filename = os.path.join(predict_dir, f"{batch_name[0]}_{repeat}.jpg")
                 Image.fromarray(decoded).save(filename)
 
-
                 shadowfree_img = batch["pixel_values"][0].cpu().permute(1, 2, 0).numpy()
                 shadowfree_img = ((np.clip((shadowfree_img + 1) / 2, 0, 1)) * 255).astype(np.uint8)
                 shadowfree_path = os.path.join(shadowfree_dir, f"{batch_name[0]}_{repeat}.png")
                 Image.fromarray(shadowfree_img).save(shadowfree_path)
+
+                shadow_img = batch["gt"][0].cpu().permute(1, 2, 0).numpy()
+                shadow_img = ((np.clip((shadow_img + 1) / 2, 0, 1)) * 255).astype(np.uint8)
+                shadowimge_path = os.path.join(shadow_img_dir, f"{batch_name[0]}_{repeat}.png")
+                Image.fromarray(shadow_img).save(shadowimge_path)
 
                 object_mask_tensor = batch["conditioning_pixel_values"][0, -1, :, :].cpu()
                 object_mask = (object_mask_tensor.numpy().clip(0, 1) * 255).astype(np.uint8)
