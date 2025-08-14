@@ -33,7 +33,6 @@ We also present a visual comparison between SDXL and SD 1.5 using different rand
     git clone https://github.com/huggingface/diffusers
     cd diffusers
     pip install -e .
-    pip install -r requirements.txt
 
 And initialize an [🤗Accelerate](https://github.com/huggingface/accelerate/) environment with:
 
