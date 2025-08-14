@@ -196,8 +196,7 @@ class TestDataset(Dataset):
             "unet_added_conditions": {
                 "text_embeds": self.text_embeds[idx],
                 "time_ids": self.time_ids[idx]
-            },
-            "name": self.all_name[idx]
+            }
         }
 
 class IPAdapter(torch.nn.Module):
